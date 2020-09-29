@@ -97,7 +97,7 @@ ggplot(data = df) +
 # 3.5.1 Exercises
 # 1. What happens if you facet on a continuous variable?
 
-# It creates a plot for every value of the continuous variable
+# It's converted to categorical and it creates a plot for every level of the categorical variable
 ggplot(data = df) + 
   geom_point(mapping = aes(x = cty, y = hwy)) + 
   facet_wrap(~ displ, nrow = 2)
@@ -119,6 +119,25 @@ ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy)) +
   facet_grid(. ~ cyl) # split the scatterplot by cyl along the x-axis
 
+# 4. Take the first faceted plot in this section:
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, nrow = 2)
+# For small number of observations, might be useful to use color since you can compare the position
+# among classes. However, if there are many observations, probably facet offers a less crowed view
+
+# 5. Read ?facet_wrap. What does nrow do? What does ncol do? What other options control the layout 
+# of the individual panels? Why doesn’t facet_grid() have nrow and ncol arguments?
+
+# nrow and ncol determine the number of rows and columns of the facet plot
+
+# facet_grid() does not have since the number of rows and cols depends on the nº of levels of the
+# chosen variables
+
+# 6. When using facet_grid() you should usually put the variable with more unique levels in the 
+# columns. Why?
+
+# There will be more space for columns if the plot is laid out horizontally (landscape).
 
 
 
