@@ -139,8 +139,109 @@ ggplot(data = mpg) +
 
 # There will be more space for columns if the plot is laid out horizontally (landscape).
 
+#######-------------------------------------------------------------
+# 3.6 GEOMETRIC OBJECTS
+
+# 1. What geom would you use to draw a line chart? A boxplot? A histogram? An area chart?
+geom_line()
+geom_boxplot()
+geom_histogram()
+geom_area()
+
+# 2. Run this code in your head and predict what the output will look like. Then, run the code in 
+# R and check your predictions.
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + 
+  geom_point() + 
+  geom_smooth(se = FALSE)
+
+# 3. What does show.legend = FALSE do? What happens if you remove it?
+# Why do you think I used it earlier in the chapter?
+
+# It removes the legend that is created automatically for every level of a variable
+
+# 4. What does the se argument to geom_smooth() do?
+
+# It removes the standard deviation plotted around the line that is incorporated by default
+
+# 5. Will these two graphs look different? Why/why not?
+
+# They're both the same, it only changes where the mappings are being made
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  geom_smooth()
+
+ggplot() + 
+  geom_point(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_smooth(data = mpg, mapping = aes(x = displ, y = hwy))
+
+# 6. Recreate the R code necessary to generate the following graphs.
+ggplot(data = mpg,
+       mapping = aes(x = displ, y = hwy)) +
+  geom_point(size = 10) +
+  geom_smooth(se = FALSE)
+
+ggplot(data = mpg,
+       mapping = aes(x = displ, y = hwy)) +
+  geom_point(size = 10) +
+  geom_smooth(mapping = aes(group = drv),
+              se = FALSE)
+
+ggplot(data = mpg,
+       mapping = aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(color = drv),
+             size = 10) +
+  geom_smooth(se = FALSE)
+
+ggplot(data = mpg,
+       mapping = aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(color = drv),
+             size = 10) +
+  geom_smooth(mapping = aes(linetype = drv),
+              se = FALSE)
+
+ggplot(data = mpg,
+       mapping = aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(fill = drv),
+             size = 10, 
+             stroke = 5,
+             shape = 21,
+             color = "white")
 
 
+## --------------------------------------------------
+# 3.7   STATISTICAL TRANSFORMATIONS
+
+# 1. What is the default geom associated with stat_summary()? How could you rewrite the previous 
+# plot to use that geom function instead of the stat function?
+
+ggplot(data = diamonds) +
+  geom_boxplot(mapping = aes(x = cut, y = depth))
+
+# 2. What does geom_col() do? How is it different to geom_bar()?
+
+# geom_bar() provides a count of the number of cases of each group
+# geom_col() plots the value of each observation
+
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = depth))
+
+# 3. Most geoms and stats come in pairs that are almost always used in concert. Read through the 
+# documentation and make a list of all the pairs. What do they have in common?
+
+# 4. What variables does stat_smooth() compute? What parameters control its behaviour?
+
+# 5. In our proportion bar chart, we need to set group = 1. Why? In other words what is the 
+# problem with these two graphs?
+
+#  If group = 1 is not included, then all the bars in the plot will have the same height, a height 
+# of 1. The function geom_bar() assumes that the groups are equal to the x values since the stat computes the counts within the group.
+# Add group = 1 --> the proportion every group with respect of total
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, y = ..prop..))
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = color, y = ..prop..))
 
 
 
