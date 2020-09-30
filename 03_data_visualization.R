@@ -244,4 +244,30 @@ ggplot(data = diamonds) +
   geom_bar(mapping = aes(x = cut, fill = color, y = ..prop..))
 
 
+## ---------------------------------------------------------------
+## 3.8 POSITION ADJUSTMENTS
+
+# 1. What is the problem with this plot? How could you improve it?
+
+# We can't see exactly where the density is greater, therefore we can use jitter
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point(position = "jitter")
+
+# 2. What parameters to geom_jitter() control the amount of jittering?
+
+# width and height
+
+# 3. Compare and contrast geom_jitter() with geom_count().
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_jitter()
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_count()
+# geom_jitter reflects density by adding more points, geom_count does so by drawing bigger points
+
+# 4. What’s the default position adjustment for geom_boxplot()? Create a visualisation of the mpg 
+# dataset that demonstrates it
+ggplot(data = mpg, mapping = aes(x = drv, y = displ)) + 
+  geom_boxplot() # default position = "dodge2"
+
+
 
