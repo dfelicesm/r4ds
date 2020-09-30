@@ -269,5 +269,29 @@ ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
 ggplot(data = mpg, mapping = aes(x = drv, y = displ)) + 
   geom_boxplot() # default position = "dodge2"
 
+# -----------------------------------------------------------------------------------
+# 3.9 COORDINATE SYSTEMS
+
+# 1. Turn a stacked bar chart into a pie chart using coord_polar()
+ggplot(data = mpg) +
+  geom_bar(mapping = aes(x = factor(1), fill = drv)) + 
+  coord_polar(theta = "y")
+
+# 2. What does labs() do? Read the documentation.
+
+# Modify axis, legend, and plot labels
+
+# 3. What’s the difference between coord_quickmap() and coord_map()?
+
+# Different ways of using maps in ggplot. coord_quickmap works better for smaller areas and 
+# preserve straight lines. coord_map() projects an espherical area to 2d plot
+
+# 4. What does the plot below tell you about the relationship between city and highway mpg? Why is 
+# coord_fixed() important? What does geom_abline() do?
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_point() + 
+  geom_abline() + # plots a line with intercept 0 and slope 1, helping to understand the slope of 
+  # relation between cty and hwy
+  coord_fixed() # fixes the ratio between axis 
 
 
