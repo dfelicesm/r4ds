@@ -60,6 +60,26 @@ filter(flights, is.na(dep_time)) # 8245 flight don't have a dep_time
 # NA | TRUE could be either NA or TRUE so in this case the condition is evaluated as TRUE
 # FALSE & NA evaluates as FALSE so it's not NA
 
+### --------------------------------------------------------------
+# 5.3 ARRANGE ROWS WITH ARRANGE()
+# --------------------------------------------
+
+# 1. How could you use arrange() to sort all missing values to the start? (Hint: use is.na()).
+arrange(flights, desc(is.na(dep_time)), dep_time)
+
+
+# 2. Sort flights to find the most delayed flights. Find the flights that left earliest.
+arrange(flights, desc(arr_delay))
+
+view(arrange(flights, hour, minute))
+
+# 3. Sort flights to find the fastest (highest speed) flights.
+arrange(flights, desc(distance/air_time))
+
+# 4. Which flights travelled the farthest? Which travelled the shortest?
+arrange(flights, desc (distance))
+arrange(flights, distance)
+
 
 
 
