@@ -81,5 +81,111 @@ arrange(flights, desc (distance))
 arrange(flights, distance)
 
 
+### --------------------------------------------------------------
+# 5.4 SELECT COLUMNS WITH SELECT()
+# --------------------------------------------
+
+# 1. Brainstorm as many ways as possible to select dep_time, dep_delay, arr_time, and arr_delay 
+# from flights.
+select(flights, dep_time, dep_delay, arr_time, arr_delay)
+select(flights, "dep_time", "dep_delay", "arr_time", "arr_delay")
+select(flights, 4, 6, 7, 9) # not recommended since variables can change position
+select(flights, starts_with("dep"), starts_with("arr"))
+select(flights, one_of(c("dep_time", "dep_delay", "arr_time", "arr_delay")))
+
+# 2. What happens if you include the name of a variable multiple times in a select() call?
+select(flights, dep_time, dep_delay, dep_time) # it only takes into account the first time 
+
+# 3. What does the one_of() function do? Why might it be helpful in conjunction with this vector?
+vars <- c("year", "month", "day", "dep_delay", "arr_delay")
+select(flights, one_of(vars)) # It selects a column if it is "one_of" the variables in the vector
+
+# Does the result of running the following code surprise you? How do the select helpers deal 
+# with case by default? How can you change that default?
+select(flights, contains("TIME")) #it selects everything that contains "time" it isn't case 
+                        # sensitive by default
+
+select(flights, contains("TIME", ignore.case = FALSE)) # now it's case sensitive
+
+### --------------------------------------------------------------
+# 5.4 MUTATE COLUMNS WITH MUTATE()
+# --------------------------------------------
+
+flights_sml <- select(flights, 
+                      year:day, 
+                      contains("time"),
+                      ends_with("delay"), 
+                      distance)
+                      
+                      
+
+# 1. Currently dep_time and sched_dep_time are convenient to look at, but hard to compute with 
+# because they’re not really continuous numbers. Convert them to a more convenient representation 
+# of number of minutes since midnight.
+mutate(flights_sml,
+       dep_time_minutes = (dep_time %/% 100) * 60 + dep_time %% 100,
+       sched_dep_time_minutes = (sched_dep_time %/% 100) * 60 + sched_dep_time %% 100) 
+
+# 2. Compare air_time with arr_time - dep_time. What do you expect to see? What do you see? What 
+# do you need to do to fix it?
+
+flights %>% mutate(time_diff = arr_time - dep_time) %>%
+  select(air_time, 
+         time_diff, 
+         sched_dep_time, 
+         dep_time, dep_delay, 
+         sched_arr_time, 
+         arr_time, 
+         arr_delay)
+
+# I'd expect air_time and time_diff to be the same but they're not. Maybe some time zone issue??
+
+
+# 3. Compare dep_time, sched_dep_time, and dep_delay. How would you expect those three numbers 
+# to be related?
+select(flights, dep_time, sched_dep_time, dep_delay)
+
+# this columns should they be correct, dep_time should be equal to sched_dep_time + dep_delay
+flights %>% 
+  select(dep_time, sched_dep_time, dep_delay) %>%
+  mutate(dep_time_minutes = (dep_time %/% 100) * 60 + dep_time %% 100,
+         sched_dep_time_minutes = (sched_dep_time %/% 100) * 60 + sched_dep_time %% 100,
+         verification_column = dep_time_minutes == sched_dep_time_minutes + dep_delay) %>% # all should be TRUE 
+  filter(verification_column != TRUE)
+  
+# However this relation is not true because when a flight is delayed from one day to the next one
+# the calculation is not right anymore due to how the columns are stored
+
+# 4. Find the 10 most delayed flights using a ranking function. How do you want to handle ties? 
+# Carefully read the documentation for min_rank()
+?min_rank
+
+flights %>% mutate(most_delayed = min_rank(desc(dep_delay))) %>%
+  select(dep_delay, most_delayed) %>%
+  arrange(most_delayed)
+
+# 5. What does 1:3 + 1:10 return? Why?
+1:3 + 1:10
+
+# it returns [1]  2  4  6  5  7  9  8 10 12 11
+# it "recycles" the shorter vector [1, 2, 3] to sum it to [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# it is the same as 
+c(1+1, 2+2, 3+3, 1+4, 2+5, 3+6, 1+7, 2+8, 3+9, 1+10)
+
+# 6. What trigonometric functions does R provide?
+cos(x)
+sin(x)
+tan(x)
+
+acos(x)
+asin(x)
+atan(x)
+atan2(y, x)
+
+cospi(x)
+sinpi(x)
+tanpi(x)
+  
+  
 
 
