@@ -108,7 +108,7 @@ select(flights, contains("TIME")) #it selects everything that contains "time" it
 select(flights, contains("TIME", ignore.case = FALSE)) # now it's case sensitive
 
 ### --------------------------------------------------------------
-# 5.4 MUTATE COLUMNS WITH MUTATE()
+# 5.5 ADD NEW COLUMNS WITH MUTATE()
 # --------------------------------------------
 
 flights_sml <- select(flights, 
@@ -186,6 +186,98 @@ cospi(x)
 sinpi(x)
 tanpi(x)
   
+### --------------------------------------------------------------
+# 5.5 MUTATE COLUMNS WITH MUTATE()
+# --------------------------------------------
+
+# 1. Brainstorm at least 5 different ways to assess the typical delay characteristics of a group of 
+# flights. Consider the following scenarios:
+
+# A flight is 15 minutes early 50% of the time, and 15 minutes late 50% of the time.
+flights %>% group_by(flight) %>%
+  mutate(early = arr_delay <= - 15,
+         late = arr_delay >= 15) %>% 
+  summarise(early_prop = mean(early, na.rm = TRUE), 
+            late_prop = mean(late, na.rm = TRUE)) %>%
+  filter(early_prop >= 0.5, late_prop >= 0.5) 
+
+# A flight is always 10 minutes late.
+flights %>% group_by(flight) %>%
+  summarise(late_prop = mean(arr_delay >= 10, na.rm = TRUE)) %>%
+  filter(late_prop == 1)
+
+# A flight is 30 minutes early 50% of the time, and 30 minutes late 50% of the time.
+flights %>% group_by(flight) %>%
+  summarise(early_prop = mean(arr_delay <= -30, na.rm = TRUE),
+            late_prop = mean(arr_delay >= 30, na.rm = TRUE)) %>%
+  filter(early_prop >= 0.5, late_prop >= 0.5)
+
+# 99% of the time a flight is on time. 1% of the time it’s 2 hours late.
+flights %>% group_by(flight) %>%
+  summarise(on_time = mean(arr_delay == 0, na.rm = TRUE),
+            very_late = mean(arr_delay >= 2, na.rm = TRUE),
+            count = n()) %>%
+  filter(on_time >= 0.99,
+         very_late >= 0.01) 
+
+# Which is more important: arrival delay or departure delay?
   
+  
+
+#2. Come up with another approach that will give you the same output as 
+# not_cancelled %>% count(dest) and not_cancelled %>% count(tailnum, wt = distance) 
+# (without using count()).
+not_cancelled <- flights %>% 
+  filter(!is.na(dep_delay), !is.na(arr_delay))
+
+not_cancelled %>% group_by(dest) %>%
+  summarise(n())
+
+not_cancelled %>% group_by(tailnum) %>%
+  summarise(distance = sum(distance))
+
+# 3. Our definition of cancelled flights (is.na(dep_delay) | is.na(arr_delay) ) is slightly 
+# suboptimal. Why? Which is the most important column?
+
+# I would've done this myself
+cancelled_2 <- filter(flights, is.na(dep_time) , is.na(arr_time))
+
+# 4. Look at the number of cancelled flights per day. Is there a pattern? Is the proportion of 
+# cancelled flights related to the average delay?
+flights %>% group_by(year, month, day) %>%
+  mutate(cancelled = is.na(dep_time) & is.na(arr_time)) %>%
+  summarise(mean_delay = mean(arr_delay, na.rm = TRUE),
+            cancelation_prop = mean(cancelled, na.rm = TRUE),
+            cancelation_count = sum(cancelled)) %>%
+  filter(cancelation_prop < 0.5) %>%
+  ggplot(mapping = aes(x = cancelation_prop, y = mean_delay)) +
+  geom_point() + 
+  geom_smooth(se = FALSE)
+# If we remove the outliers in the far right, we can see that the cancellation rate is very 
+# correlated with average delay of a plane. Planes with high cancelation rate are very often 
+# significantly late
+
+# 5. Which carrier has the worst delays? Challenge: can you disentangle the effects of bad airports 
+# vs. bad carriers? Why/why not? 
+#(Hint: think about flights %>% group_by(carrier, dest) %>% summarise(n()))
+
+flights %>% group_by(carrier) %>%
+  summarise(average_delay = mean(arr_delay, na.rm = TRUE)) %>%
+  arrange(desc(average_delay))
+
+# F9 and FL were late by an average of 21.9 and 20.1 respectively
+
+flights %>% group_by(dest) %>%
+  summarise(average_delay = mean(arr_delay, na.rm = TRUE)) %>%
+  arrange(desc(average_delay))
+
+save <- flights %>% group_by(carrier, dest) %>% 
+  summarise(average_delay = mean(arr_delay, na.rm = TRUE),
+            count = n()) %>%
+  group_by(carrier) %>%
+  mutate(airport_prop = count / sum(count)) %>%
+  filter(dest == "CAE" | dest == "TUL" | dest == "OKC" )
+
+
 
 
