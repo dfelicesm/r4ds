@@ -187,7 +187,7 @@ sinpi(x)
 tanpi(x)
   
 ### --------------------------------------------------------------
-# 5.5 MUTATE COLUMNS WITH MUTATE()
+# 5.5 GROUPED SUMMARIES WITH SUMMARISE()
 # --------------------------------------------
 
 # 1. Brainstorm at least 5 different ways to assess the typical delay characteristics of a group of 
@@ -283,5 +283,22 @@ save <- flights %>% group_by(carrier, dest) %>%
 flights %>% 
   count(dest, sort = TRUE) # sorts the counts in descending order
 # can be useful when you want to know the most frequent groups
+
+### --------------------------------------------------------------
+# 5.5 GROUPED MUTATES AND FILTERS
+# --------------------------------------------
+
+# 1. Refer back to the lists of useful mutate and filtering functions. Describe how each operation 
+# changes when you combine it with grouping.
+
+
+# 2. Which plane (tailnum) has the worst on-time record?
+flights %>% group_by(tailnum) %>%
+  summarise(on_time_count = sum(arr_delay <= 0, na.rm = TRUE)) %>%
+  arrange(on_time_count)
+
+# there are many planes that have never been on time
+
+
 
 
