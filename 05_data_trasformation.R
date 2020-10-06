@@ -279,5 +279,9 @@ save <- flights %>% group_by(carrier, dest) %>%
   filter(dest == "CAE" | dest == "TUL" | dest == "OKC" )
 
 
+# 6. What does the sort argument to count() do. When might you use it?
+flights %>% 
+  count(dest, sort = TRUE) # sorts the counts in descending order
+# can be useful when you want to know the most frequent groups
 
 
