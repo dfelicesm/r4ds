@@ -299,6 +299,12 @@ flights %>% group_by(tailnum) %>%
 
 # there are many planes that have never been on time
 
+# 3. What time of day should you fly if you want to avoid delays as much as possible?
+flights %>% group_by(hour) %>%
+  summarise(delay_prop = mean(arr_delay > 0, na.rm = TRUE),
+            average_delay = mean(arr_delay, na.rm = TRUE)) %>% 
+  arrange(desc(delay_prop))
+# Best to avoid times between 3pm and midnight. 
 
 
 
