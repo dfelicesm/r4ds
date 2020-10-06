@@ -187,7 +187,7 @@ sinpi(x)
 tanpi(x)
   
 ### --------------------------------------------------------------
-# 5.5 GROUPED SUMMARIES WITH SUMMARISE()
+# 5.6 GROUPED SUMMARIES WITH SUMMARISE()
 # --------------------------------------------
 
 # 1. Brainstorm at least 5 different ways to assess the typical delay characteristics of a group of 
@@ -285,7 +285,7 @@ flights %>%
 # can be useful when you want to know the most frequent groups
 
 ### --------------------------------------------------------------
-# 5.5 GROUPED MUTATES AND FILTERS
+# 5.7 GROUPED MUTATES AND FILTERS
 # --------------------------------------------
 
 # 1. Refer back to the lists of useful mutate and filtering functions. Describe how each operation 
@@ -299,6 +299,38 @@ flights %>% group_by(tailnum) %>%
 
 # there are many planes that have never been on time
 
+# 3. What time of day should you fly if you want to avoid delays as much as possible?
+flights %>% group_by(hour) %>%
+  summarise(delay_prop = mean(arr_delay > 0, na.rm = TRUE),
+            average_delay = mean(arr_delay, na.rm = TRUE)) %>% 
+  arrange(desc(delay_prop))
+# Best to avoid times between 3pm and midnight. 
 
 
+# 4. For each destination, compute the total minutes of delay. For each flight, compute the 
+# proportion of the total delay for its destination.
 
+flights %>% group_by(dest) %>%
+  summarise(total_delay = sum(arr_delay, na.rm = TRUE))
+
+flights %>% group_by(dest, flight) %>%
+  summarise(total_delay = sum(arr_delay, na.rm = TRUE)) %>%
+  group_by(dest) %>%
+  mutate(delay_prop = total_delay/sum(total_delay, na.rm = TRUE))
+
+# 5. Delays are typically temporally correlated: even once the problem that caused the initial 
+# delay has been resolved, later flights are delayed to allow earlier flights to leave. Using lag(), 
+# explore how the delay of a flight is related to the delay of the immediately preceding flight.
+view(flights %>% group_by(origin) %>%
+  mutate(previous_flight_delay = lag(dep_delay))) %>%
+  ggplot(mapping = aes(x = dep_delay, y = previous_flight_delay)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+
+# there could be a relationship between previous delay and current delay but it's not very clear
+
+# 6. Look at each destination. Can you find flights that are suspiciously fast? (i.e. flights that 
+# represent a potential data entry error). Compute the air time of a flight relative to the 
+# shortest flight to that destination. Which flights were most delayed in the air?
+view(flights %>% group_by(flight, dest) %>%
+  mutate(relative_time = air_time/min(air_time, na.rm = TRUE)))
