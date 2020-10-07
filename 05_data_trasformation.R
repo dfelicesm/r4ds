@@ -294,23 +294,28 @@ flights %>%
 
 # 2. Which plane (tailnum) has the worst on-time record?
 flights %>% group_by(tailnum) %>%
-  summarise(on_time_count = sum(arr_delay <= 0, na.rm = TRUE)) %>%
-  arrange(on_time_count)
+  summarise(on_time_prop = mean(arr_delay <= 0, na.rm = TRUE),
+            count = n()) %>%
+  arrange(on_time_prop)
 
 # there are many planes that have never been on time
 
 # 3. What time of day should you fly if you want to avoid delays as much as possible?
-flights %>% group_by(hour) %>%
+(day_time_delay <- flights %>% group_by(hour) %>%
   summarise(delay_prop = mean(arr_delay > 0, na.rm = TRUE),
             average_delay = mean(arr_delay, na.rm = TRUE)) %>% 
-  arrange(desc(delay_prop))
+  arrange(desc(delay_prop)))
 # Best to avoid times between 3pm and midnight. 
-
+ggplot(data = day_time_delay,
+       mapping = aes(x = hour, y = delay_prop)) +
+  geom_point() +
+  geom_smooth(se = FALSE) # flights get more and more delayed as the day advances
 
 # 4. For each destination, compute the total minutes of delay. For each flight, compute the 
 # proportion of the total delay for its destination.
 
-flights %>% group_by(dest) %>%
+flights %>% filter(arr_delay > 0) %>%
+  group_by(dest) %>%
   summarise(total_delay = sum(arr_delay, na.rm = TRUE))
 
 flights %>% group_by(dest, flight) %>%
@@ -321,8 +326,9 @@ flights %>% group_by(dest, flight) %>%
 # 5. Delays are typically temporally correlated: even once the problem that caused the initial 
 # delay has been resolved, later flights are delayed to allow earlier flights to leave. Using lag(), 
 # explore how the delay of a flight is related to the delay of the immediately preceding flight.
-view(flights %>% group_by(origin) %>%
-  mutate(previous_flight_delay = lag(dep_delay))) %>%
+flights %>% filter(!is.na(dep_time), !is.na(arr_time)) %>%
+       group_by(origin) %>%
+  mutate(previous_flight_delay = lag(dep_delay)) %>%
   ggplot(mapping = aes(x = dep_delay, y = previous_flight_delay)) +
   geom_point() +
   geom_smooth(se = FALSE)
@@ -334,3 +340,28 @@ view(flights %>% group_by(origin) %>%
 # shortest flight to that destination. Which flights were most delayed in the air?
 view(flights %>% group_by(flight, dest) %>%
   mutate(relative_time = air_time/min(air_time, na.rm = TRUE)))
+
+# 7. Find all destinations that are flown by at least two carriers. Use that information to rank 
+# the carriers.
+flights %>% group_by(dest) %>%
+  mutate(number_carriers = n_distinct(carrier)) %>%
+  filter(number_carriers >= 2) %>%
+  group_by(carrier) %>%
+  summarise(n = n_distinct(dest)) %>%
+  arrange(desc(n))
+
+# 8. For each plane, count the number of flights before the first delay of greater than 1 hour.
+flights %>% filter(!is.na(arr_delay)) %>%
+  group_by(tailnum) %>%
+  mutate(very_late = arr_delay > 60,
+         very_late_cumulative = cumsum(very_late)) %>%
+  filter(very_late_cumulative == 0) %>%
+  summarise(flights_before_very_late = n())
+
+
+
+
+
+
+
+
