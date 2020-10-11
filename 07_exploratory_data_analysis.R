@@ -62,7 +62,7 @@ ggplot(data = diamonds) +
 
 
 ###################################################################################################
-# 7.3 VARIATION
+# 7.4 MISSING VALUES
 ###################################################################################################
 
 # 1. What happens to missing values in a histogram? What happens to missing values in a bar chart? 
@@ -88,6 +88,30 @@ select_if(flights, is_character) %>%
 
 # that missing values will not be taken into account to calculate mean and sum
 
+###################################################################################################
+# 7.4 MISSING VALUES
+###################################################################################################
+
+# 1. Use what you’ve learned to improve the visualisation of the departure times of cancelled vs. 
+# non-cancelled flights.
+flights %>% 
+  mutate(cancelled = is.na(dep_time) & is.na(arr_time)) %>%
+  ggplot() + 
+  geom_boxplot(mapping = aes(x = cancelled, y = hour))
+
+flights %>% 
+  mutate(cancelled = is.na(dep_time) & is.na(arr_time)) %>%
+  ggplot() + 
+  geom_freqpoly(mapping = aes(x = hour, y = ..density.., color = cancelled),
+                binwidth = 1) # it can be seen clearly that among those flights that are cancelled
+                       # a big proportion happens during the second part of the day
+
+
+flights %>% 
+  mutate(cancelled = is.na(dep_time) & is.na(arr_time)) %>%
+  ggplot() + 
+  geom_freqpoly(mapping = aes(x = hour, color = cancelled),
+                binwidth = 1)
 
 
 
