@@ -1,4 +1,5 @@
 library(tidyverse)
+library(nycflights13)
 
 # 7.3 VARIATION
 
@@ -20,7 +21,7 @@ ggplot(data = diamonds) +
 
 ggplot(data = diamonds) +
   geom_histogram(mapping = aes(x = price),
-                 binwidth = 50)
+                 binwidth = 5)
 view(diamonds %>% 
   count(cut_width(price, 100)) )
 
@@ -57,6 +58,39 @@ ggplot(data = diamonds) +
 ggplot(data = diamonds) +
   geom_histogram(mapping = aes(x = price))
 # if you don't specify binwidth, ggplot generates 30 bins
+
+
+
+###################################################################################################
+# 7.3 VARIATION
+###################################################################################################
+
+# 1. What happens to missing values in a histogram? What happens to missing values in a bar chart? 
+# Why is there a difference?
+flights %>% 
+  mutate(
+    cancelled = is.na(dep_time),
+    hour = dep_time %/% 100,
+    min = dep_time %% 100,
+    dep_time = hour + min / 60
+  ) %>% 
+  ggplot() +
+  geom_histogram(mapping = aes(x = dep_time),
+                 binwidth = 1)
+
+select_if(flights, is_character) %>% 
+  mutate(no_plane = ifelse(is.na(tailnum), NA, "Known plane")) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x = no_plane))
+# the histogram is calculatd without the missing values and the bar char believes NA is a category
+
+# What does na.rm = TRUE do in mean() and sum()?
+
+# that missing values will not be taken into account to calculate mean and sum
+
+
+
+
 
 
 
