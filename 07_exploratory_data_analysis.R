@@ -89,7 +89,7 @@ select_if(flights, is_character) %>%
 # that missing values will not be taken into account to calculate mean and sum
 
 ###################################################################################################
-# 7.4 MISSING VALUES
+# 7.5 COVARIATION
 ###################################################################################################
 
 # 1. Use what you’ve learned to improve the visualisation of the departure times of cancelled vs. 
@@ -113,9 +113,47 @@ flights %>%
   geom_freqpoly(mapping = aes(x = hour, color = cancelled),
                 binwidth = 1)
 
+# 2. What variable in the diamonds dataset is most important for predicting the price of a diamond? 
+# How is that variable correlated with cut? Why does the combination of those two relationships 
+# lead to lower quality diamonds being more expensive?
+ggplot(data = diamonds, 
+       mapping = aes(y = price)) +
+  geom_point(mapping = aes(x = carat)) # quite positive relations between price and carat
+
+ggplot(data = diamonds, 
+       mapping = aes(y = price)) +
+  geom_boxplot(mapping = aes(x = cut))
+
+ggplot(data = diamonds, 
+       mapping = aes(y = price)) +
+  geom_boxplot(mapping = aes(x = reorder(color, price, FUN = median))) # there are some colors that
+                        # are more expensive than others, but differences are not huge in general
+
+ggplot(data = diamonds, 
+       mapping = aes(y = price)) +
+  geom_boxplot(mapping = aes(x = reorder(clarity, price, FUN = median))) # prices do seem to vary
+                                                      # significantly among categories
+
+ggplot(data = diamonds, 
+       mapping = aes(y = price)) +
+  geom_jitter(mapping = aes(x = table)) # I can see nothing
+
+ggplot(data = diamonds, 
+       mapping = aes(y = price)) +
+  geom_point(mapping = aes(x = x)) # price seems to increase while with greater values of x 
+                # although the increases do plateau
+
+ggplot(data = diamonds, 
+       mapping = aes(y = price)) +
+  geom_point(mapping = aes(x = y)) 
+
+ggplot(data = diamonds, 
+       mapping = aes(y = price)) +
+  geom_point(mapping = aes(x = z))
 
 
-
-
-
+ggplot(data = diamonds) +
+  geom_boxplot(mapping = aes(x = cut, y = carat)) # diamonds with ideal cuts, have lower carat
+# since carat is very correlated with price, it explains the fact that worse cuts seemed to be
+# more expensive
 
