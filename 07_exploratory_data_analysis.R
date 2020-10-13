@@ -95,6 +95,8 @@ select_if(flights, is_character) %>%
 # 7.5 COVARIATION
 ###################################################################################################
 
+## 7.5.1. A CATEGORICAL AND CONTINUOUS VALUE
+
 # 1. Use what you’ve learned to improve the visualisation of the departure times of cancelled vs. 
 # non-cancelled flights.
 flights %>% 
@@ -204,8 +206,34 @@ ggplot(data = diamonds) +
 # between a continuous and categorical variable. The ggbeeswarm package provides a number of methods 
 # similar to geom_jitter(). List them and briefly describe what each one does.
 
+## 7.5.2. TWO CATEGORICAL VARIABLES
 
+# 1. How could you rescale the count dataset above to more clearly show the distribution of cut 
+# within colour, or colour within cut?
+diamonds %>%
+  count(color, cut) %>%
+  group_by(color) %>%
+  mutate(cut_within_color = n / sum(n)) %>%
+  ggplot() + 
+  geom_tile(mapping = aes(x = color, y = cut, fill = cut_within_color))
 
+# 2. Use geom_tile() together with dplyr to explore how average flight delays vary by destination 
+# and month of year. What makes the plot difficult to read? How could you improve it?
+
+flights %>% 
+  group_by(dest, month) %>%
+  summarise(average_delay = mean(arr_delay, na.rm = TRUE)) %>%
+  ggplot(mapping = aes(x = dest, y = month)) +
+  geom_tile(mapping = aes(fill = average_delay)) # There are way too many destinations to be able
+# to understand what is going on. You could try to do some filter and retain the most popular
+
+# 3. Why is it slightly better to use aes(x = color, y = cut) rather than aes(x = cut, y = color) 
+# in the example above?
+
+diamonds %>% 
+  count(color, cut) %>%  
+  ggplot(mapping = aes(x = cut, y = color)) +
+  geom_tile(mapping = aes(fill = n)) # the axis labels look less clean if they represent "cut"
 
 
 
