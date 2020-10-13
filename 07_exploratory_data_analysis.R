@@ -1,5 +1,7 @@
 library(tidyverse)
 library(nycflights13)
+library(ggstance)
+library(lvplot)
 
 # 7.3 VARIATION
 
@@ -156,4 +158,52 @@ ggplot(data = diamonds) +
   geom_boxplot(mapping = aes(x = cut, y = carat)) # diamonds with ideal cuts, have lower carat
 # since carat is very correlated with price, it explains the fact that worse cuts seemed to be
 # more expensive
+
+# 3. Install the ggstance package, and create a horizontal boxplot. How does this compare to using 
+# coord_flip()
+ggplot(data = diamonds) +
+  geom_boxplot(mapping = aes(x = cut, y = carat)) +
+  coord_flip()
+
+ggplot(data = diamonds) +
+  geom_boxploth(mapping = aes(x = carat, y = cut))
+
+# In my case they look exactly the same. I believe ggstance has been made part of ggplot2 3.3
+
+# 4. One problem with boxplots is that they were developed in an era of much smaller datasets and 
+# tend to display a prohibitively large number of “outlying values”. One approach to remedy this 
+# problem is the letter value plot. Install the lvplot package, and try using geom_lv() to display 
+# the distribution of price vs cut. What do you learn? How do you interpret the plots?
+
+ggplot(data = diamonds) +
+  geom_lv(mapping = aes(x = cut, y = price)) # that distribution of prices among different cuts 
+                                  # looks similar. There might seem to be a smaller presence of 
+                                  # cheaper diamonds among the "fair" cuts
+
+
+# 5. Compare and contrast geom_violin() with a facetted geom_histogram(), or a coloured 
+# geom_freqpoly(). What are the pros and cons of each method?
+
+ggplot(data = diamonds) +
+  geom_violin(mapping = aes(x = cut, y = price)) # allows for the best understanding of the 
+                                                  # distribution within each category
+
+ggplot(data = diamonds) +
+  geom_histogram(mapping = aes(x = price),
+                 binwidth = 100) +
+  facet_wrap(~cut) # it gives the best insight to visualize how many diamonds are in each of the
+# categories. However, it's a bit harder to compare among categories due to the size differences
+
+ggplot(data = diamonds) +
+  geom_freqpoly(mapping = aes(x = price, color = cut)) # it tries to do both, between categories 
+# and within categories. However, it might be difficult to extract all the information from this
+# plot alone
+
+
+
+
+
+
+
+
 
