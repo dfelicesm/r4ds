@@ -2,6 +2,7 @@ library(tidyverse)
 library(nycflights13)
 library(ggstance)
 library(lvplot)
+library(ggbeeswarm)
 
 # 7.3 VARIATION
 
@@ -199,6 +200,9 @@ ggplot(data = diamonds) +
 # and within categories. However, it might be difficult to extract all the information from this
 # plot alone
 
+# 6. If you have a small dataset, it’s sometimes useful to use geom_jitter() to see the relationship 
+# between a continuous and categorical variable. The ggbeeswarm package provides a number of methods 
+# similar to geom_jitter(). List them and briefly describe what each one does.
 
 
 
